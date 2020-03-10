@@ -1,11 +1,18 @@
 import 'package:minhasanotacoes/model/Anotacao.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
+
+import '../model/Anotacao.dart';
 
 class AnotacaoHelper {
 
   // Constantes
   static final String nomeTabela = "anotacao";
+  static final String anotacaoColumId = "id";
+  static final String anotacaoColumTitulo = "titulo";
+  static final String anotacaoColumDescricao = "descricao";
+  static final String anotacaoColumData = "data";
+
 
   static final AnotacaoHelper _anotacaoHelper = AnotacaoHelper.internal();
   Database _db;

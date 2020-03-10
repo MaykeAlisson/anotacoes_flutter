@@ -1,3 +1,5 @@
+import '../helper/AnotacaoHelper.dart';
+
 class Anotacao {
 
   int id;
@@ -6,6 +8,13 @@ class Anotacao {
   String data;
 
   Anotacao(this.titulo, this.descricao, this.data);
+
+  Anotacao.fromMap(Map map){
+    this.id = map[AnotacaoHelper.anotacaoColumId];
+    this.titulo = map[AnotacaoHelper.anotacaoColumTitulo];
+    this.descricao = map[AnotacaoHelper.anotacaoColumDescricao];
+    this.data = map[AnotacaoHelper.anotacaoColumData];
+  }
 
   Map toMap(){
 

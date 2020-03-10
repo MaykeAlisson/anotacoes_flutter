@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:minhasanotacoes/helper/AnotacaoHelper.dart';
 import 'package:minhasanotacoes/model/Anotacao.dart';
 
+import 'model/Anotacao.dart';
+import 'model/Anotacao.dart';
+
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
@@ -12,6 +15,7 @@ class _HomeState extends State<Home> {
   TextEditingController _tituloController = TextEditingController();
   TextEditingController _descricaoController = TextEditingController();
   var _db = AnotacaoHelper();
+  List<Anotacao> _anotacoes = List<Anotacao>();
 
 
   _exibirTelaCadastro(){
@@ -62,8 +66,17 @@ class _HomeState extends State<Home> {
   _recuperarAnotacoes() async {
 
     List anotacoesRecuperadas = await _db.recuperarAnotacoes();
+    List<Anotacao> listaTemporaria = List<Anotacao>();
+    for( var item in anotacoesRecuperadas){
+      Anotacao anotacao = Anotacao.fromMap(item);
+      listaTemporaria.add(anotacao);
+    }
 
-    print("lista recuperada" + anotacoesRecuperadas.toString());
+    setState(() {
+      _anotacoes = listaTemporaria;
+    });
+    listaTemporaria = null;
+//    print("lista recuperada" + anotacoesRecuperadas.toString());
 
   }
 
@@ -75,10 +88,16 @@ class _HomeState extends State<Home> {
 //    print("data atual: " + DateTime.now().toString());
     Anotacao anotacao = Anotacao(titulo, descricao, DateTime.now().toString());
     int idInsert = await _db.salvarAnotacao(anotacao);
-    print("id insert = " + idInsert.toString());
-
+//    print("id insert = " + idInsert.toString());
     _tituloController.clear();
     _descricaoController.clear();
+    _recuperarAnotacoes();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _recuperarAnotacoes();
   }
 
   @override
@@ -88,15 +107,29 @@ class _HomeState extends State<Home> {
         title: Text("Minhas anotações"),
         backgroundColor: Colors.lightGreen,
       ),
-      body: Container(),
+      body: Column(
+        children: <Widget>[
+          Expanded(
+              child: ListView.builder(
+                itemCount: _anotacoes.length,
+                  itemBuilder: (context, index){
+                  final anotacao = _anotacoes[index];
+                  return Card(
+                    child: ListTile(
+                      title: Text(anotacao.titulo),
+                      subtitle: Text("${anotacao.data} - ${anotacao.descricao}"),
+                    ),
+                  );
+                  },
+              ))
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.green,
         foregroundColor: Colors.white,
         child: Icon(Icons.add),
         onPressed: (){
-
           _exibirTelaCadastro();
-
         },
       ),
     );
