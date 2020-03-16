@@ -59,7 +59,7 @@ class _HomeState extends State<Home> {
               FlatButton(
                 onPressed: () {
                   // salva no banco
-                  _salvarAtualizarAnotacao();
+                  _salvarAtualizarAnotacao(anotacaoSelecionada: anotacao);
                   Navigator.pop(context);
                 },
                 child: Text("${textoSalvarAtualizar} "),
@@ -84,16 +84,30 @@ class _HomeState extends State<Home> {
 //    print("lista recuperada" + anotacoesRecuperadas.toString());
   }
 
-  _salvarAtualizarAnotacao({int id}) async {
+  _salvarAtualizarAnotacao({Anotacao anotacaoSelecionada}) async {
     String titulo = _tituloController.text;
     String descricao = _descricaoController.text;
 
-//    print("data atual: " + DateTime.now().toString());
-    Anotacao anotacao = Anotacao(titulo, descricao, DateTime.now().toString());
-    int idInsert = await _db.salvarAnotacao(anotacao);
-//    print("id insert = " + idInsert.toString());
+    if(anotacaoSelecionada == null){
+      Anotacao anotacao = Anotacao(titulo, descricao, DateTime.now().toString());
+      int idInsert = await _db.salvarAnotacao(anotacao);
+    }else{
+      anotacaoSelecionada.titulo = titulo;
+      anotacaoSelecionada.descricao = descricao;
+      anotacaoSelecionada.data = DateTime.now().toString();
+
+      int qtdAtualizado = await _db.atualizaAnotacao(anotacaoSelecionada);
+
+    }
+
     _tituloController.clear();
     _descricaoController.clear();
+
+    _recuperarAnotacoes();
+  }
+
+  _removerAnotacao(int id) async {
+    await _db.removerAnotacao(id);
     _recuperarAnotacoes();
   }
 
@@ -147,7 +161,7 @@ class _HomeState extends State<Home> {
                       ),
                       GestureDetector(
                         onTap: (){
-
+                          _removerAnotacao(anotacao.id);
                         },
                         child: Padding(
                           padding: EdgeInsets.only(right: 0),
